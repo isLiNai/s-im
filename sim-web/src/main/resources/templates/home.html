@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="layui-v2.6.8/layui/css/layui.css">
+    <style>
+        .main-div{
+            height: 500px;
+        }
+        .msg-row{
+            line-height: 50px;
+            margin-top: 1px;
+        }
+        .msg-top{
+            height: 15%;
+            background-color: #eeecee;
+        }
+        .msg-center{
+            height: 55%;
+            background-color: white;
+        }
+        .friend-dev{
+            background-color: #D8D8D8;
+        }
+        .option{
+            height: 30%;
+        }
+        .option-div{
+            border-top: 1px solid #eae9e9;
+            height: 22%;
+            background-color: white;
+        }
+        .option-icon{
+            font-size: 20px; color: #818282; padding-left: 10px
+        }
+        .send-div{
+            height: 50%;
+            background-color: white;
+        }
+        .send-dowm{
+            height: 28%;
+            background-color: white;
+            float: right;
+        }
+        .avatar-img{
+            width: 35px;
+            height: 35px;
+            border-radius:50%;
+            line-height:50px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        .msg_button_2{
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layui-container" style="padding-top: 100px">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md10">
+
+            <div class="layui-col-md2">
+                <div class="layui-panel friend-dev" >
+                    <div class="main-div">
+                        <div class="msg-row">
+                            <img class="avatar-img" src="img/avatar.png" alt="">
+                            123123
+                        </div>
+                        <div class="msg-row">
+                            <img class="avatar-img" src="img/avatar.png" alt="">
+                            123123
+                        </div>
+                        <div class="msg-row">
+                            <img class="avatar-img" src="img/avatar.png" alt="">
+                            123123
+                        </div>
+                        <div class="msg-row">
+                            <img class="avatar-img" src="img/avatar.png" alt="">
+                            123123
+                        </div>
+                        <div class="msg-row">
+                            <img class="avatar-img" src="img/avatar.png" alt="">
+                            123123
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-col-md8">
+                <div class="layui-panel">
+                    <div class="main-div">
+
+                        <div class="msg-top">
+
+                        </div>
+                        <div class="msg-center">
+
+                        </div>
+                        <div class="option">
+                            <div class="option-div">
+                                <i class="layui-icon layui-icon-face-smile-fine option-icon"></i>
+                                <i class="layui-icon layui-icon-picture option-icon"></i>
+                                <i class="layui-icon layui-icon-headset option-icon"></i>
+                                <i class="layui-icon layui-icon-video option-icon"></i>
+                                <i class="layui-icon layui-icon-log option-icon" style="float: right"><span style="font-size: 13px; padding-left: 6px">聊天记录</span></i>
+                            </div>
+                            <div class="send-div">
+                            </div>
+                            <div class="send-dowm">
+                                <button type="button" class="layui-btn layui-btn-sm layui-bg-blue msg_button">关闭</button>
+                                <button type="button" class="layui-btn layui-btn-sm layui-bg-blue msg_button_2">发送</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script src="layui-v2.6.8/layui/layui.js"></script>
+    <script>
+        layui.use(function(){
+            var layer = layui.layer;
+
+        });
+    </script>
+</body>
+</html>
