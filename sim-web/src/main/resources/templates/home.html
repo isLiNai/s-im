@@ -61,8 +61,26 @@
             resize: none;
         }
     </style>
+
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="layui-v2.6.8/layui/layui.js"></script>
+    <script>
+        layui.use(function(){
+            var layer = layui.layer;
+        });
+
+        $(function () {
+            var userId = document.cookie;
+            if(userId==null || userId == 'undefined' || userId == ''){
+                window.location.href = 'login';
+            }
+        });
+
+
+    </script>
 </head>
-<body>
+<body background="img/woman.jpg" style=" background-repeat:no-repeat ;background-size:100% 100%;
+background-attachment: fixed;">
 
 <div class="layui-container" style="padding-top: 100px">
     <div class="layui-row layui-col-space15">
@@ -128,14 +146,5 @@
 
     </div>
 </div>
-
-
-<script src="layui-v2.6.8/layui/layui.js"></script>
-    <script>
-        layui.use(function(){
-            var layer = layui.layer;
-
-        });
-    </script>
 </body>
 </html>

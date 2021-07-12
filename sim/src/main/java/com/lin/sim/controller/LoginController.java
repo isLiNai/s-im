@@ -7,10 +7,7 @@ import com.lin.sim.utils.RedisUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * TODO
@@ -22,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "登录")
 @RestController
 @RequestMapping("/login")
+@CrossOrigin
 public class LoginController {
 
     @Autowired
@@ -39,7 +37,7 @@ public class LoginController {
         String token = generateToken(loginReq);
 
         // token 放入redis
-        redisUtils.set(loginReq.getUserName(),token);
+//        redisUtils.set(loginReq.getUserName(),token);
         return new ResultDto<>(token);
     }
 
