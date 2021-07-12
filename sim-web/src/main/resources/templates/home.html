@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="layui-v2.6.8/layui/css/layui.css">
+    <link rel="stylesheet" href="css/msgCenter.css">
     <style>
         .main-div{
             height: 500px;
@@ -11,7 +12,13 @@
         .msg-row{
             line-height: 50px;
             margin-top: 1px;
+            cursor: pointer;
         }
+        .msg-row:hover {
+            color: black;
+            background: #f5f5f5;
+        }
+
         .msg-top{
             height: 15%;
             background-color: #eeecee;
@@ -39,7 +46,6 @@
             background-color: white;
         }
         .send-dowm{
-            height: 28%;
             background-color: white;
             float: right;
         }
@@ -64,18 +70,96 @@
 
     <script src="js/jquery-3.6.0.min.js"></script>
     <script src="layui-v2.6.8/layui/layui.js"></script>
+    <script src="js/simSocket.js"></script>
     <script>
         layui.use(function(){
             var layer = layui.layer;
         });
-
         $(function () {
             var userId = document.cookie;
             if(userId==null || userId == 'undefined' || userId == ''){
                 window.location.href = 'login';
+            }else{
+                var ws = new WebSocket("ws://localhost:8899/sim");
+                ws.onopen = function(){
+                    //当WebSocket创建成功时，触发onopen事件
+                    console.log("open");
+                    var boundObj = {
+                        key: 'bound',
+                        data: [{
+                            from: userId
+                        }]
+                    }
+                    ws.send(JSON.stringify(boundObj)); //将消息发送到服务端
+                    findOnlineUser();
+                }
+                ws.onmessage = function(e){
+                    //当客户端收到服务端发来的消息时，触发onmessage事件，参数e.data包含server传递过来的数据
+                    console.log(e.data);
+                    if(e.data!=null){
+                        var parse = JSON.parse(e.data);
+                        if(parse.key == 'online'){
+                            findOnlineUser();
+                        }
+                    }
+                }
+                ws.onclose = function(e){
+                    //当客户端收到服务端发送的关闭连接请求时，触发onclose事件
+                    console.log("close");
+                }
+                ws.onerror = function(e){
+                    //如果出现连接、处理、接收、发送数据失败的时候触发onerror事件
+                    console.log(error);
+                }
             }
+
         });
 
+        function friendClick (obj){
+            clearMsgRowCss();
+            $(obj).css('box-shadow','5px 5px 10px gray');
+            $(obj).css('color','black');
+            $(obj).css('background','#f5f5f5');
+        }
+
+        function clearMsgRowCss(){
+            $(".msg-row").css('box-shadow','');
+            $(".msg-row").css('color','');
+            $(".msg-row").css('background','');
+        }
+
+        function findOnlineUser(){
+            var loginLoadIndex = layer.load(2);
+            $.ajax({
+                type:'get',
+                url: 'http://localhost:8081/user/online',
+                success:function (data) {
+                    if (data.status == 0){
+                        console.log(data);
+                        initFriendList(data.result);
+                        layer.close(loginLoadIndex);
+                    }
+                },
+                error:function (e) {
+                    layer.close(loginLoadIndex);
+                }
+            });
+        }
+
+        function initFriendList(onlineUsers){
+           if(onlineUsers!=null && onlineUsers.length > 0){
+               $.each(onlineUsers,function(index,value){
+                   $("#friends").append(friendHtml(value));
+               });
+
+                function friendHtml(value){
+                    return " <div class=\"msg-row\" onclick=\"friendClick(this)\"> \n" +
+                        "<img class=\"avatar-img\" src=\"img/avatar.png\" alt=\"\">\n" +
+                        ""+value.userName+"" +
+                        "</div>";
+                }
+           }
+        }
 
     </script>
 </head>
@@ -88,27 +172,8 @@ background-attachment: fixed;">
 
             <div class="layui-col-md2">
                 <div class="layui-panel friend-dev" >
-                    <div class="main-div">
-                        <div class="msg-row">
-                            <img class="avatar-img" src="img/avatar.png" alt="">
-                            123123
-                        </div>
-                        <div class="msg-row">
-                            <img class="avatar-img" src="img/avatar.png" alt="">
-                            123123
-                        </div>
-                        <div class="msg-row">
-                            <img class="avatar-img" src="img/avatar.png" alt="">
-                            123123
-                        </div>
-                        <div class="msg-row">
-                            <img class="avatar-img" src="img/avatar.png" alt="">
-                            123123
-                        </div>
-                        <div class="msg-row">
-                            <img class="avatar-img" src="img/avatar.png" alt="">
-                            123123
-                        </div>
+                    <div class="main-div" id="friends">
+                        <!-- 点击可加上动画 -->
                     </div>
                 </div>
             </div>
@@ -120,8 +185,29 @@ background-attachment: fixed;">
                         <div class="msg-top">
 
                         </div>
-                        <div class="msg-center">
-
+                        <div class="msg-center talk_con">
+                            <div class="talk_show" id="words">
+                                <div class="atalk"><span>A说：吃饭了吗？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="atalk"><span>A说：吃饭了吗？</span></div>
+                                <div class="atalk"><span>A说：吃饭了吗？</span></div>
+                                <div class="atalk"><span>A说：吃饭了吗？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                            </div>
                         </div>
                         <div class="option">
                             <div class="option-div">
@@ -143,7 +229,6 @@ background-attachment: fixed;">
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 </body>

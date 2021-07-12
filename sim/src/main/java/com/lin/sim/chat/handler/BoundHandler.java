@@ -1,6 +1,7 @@
 package com.lin.sim.chat.handler;
 
 import com.lin.sim.chat.entity.Message;
+import com.lin.sim.chat.entity.MessageResp;
 import com.lin.sim.chat.session.Session;
 import io.netty.channel.ChannelHandlerContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,5 +26,7 @@ public class BoundHandler implements HandlerEngine{
         HashMap<String, String> data = msg.getData();
         String user = data.get("from");
         session.online(ctx.channel(),user);
+        // 上线通知所有用户（除本身外）
+        session.noticenAllChannel(ctx.channel());
     }
 }

@@ -144,8 +144,9 @@
                         window.location.href = 'home';
                     }
                 },
-                error:function () {
+                error:function (e) {
                     layer.close(loginLoadIndex);
+                    layer.msg('登录异常，请稍后再试！', {time: 3000, icon:5})
                     $('#loginBtn').val("登录");
                 }
             });
