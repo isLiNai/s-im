@@ -1,0 +1,22 @@
+server:
+    port: 8082
+spring:
+    application:
+        name: sim-server
+    #=========H2=====
+    datasource:
+        driverClassName: org.h2.Driver
+        password: ''
+        url: jdbc:h2:mem:testdb
+        username: sa
+    h2:
+        console:
+            enabled: true
+    jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+
+    #=========redis=====
+    redis:
+        host: 192.168.30.166
+        password:
+        port: 6379

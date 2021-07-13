@@ -1,4 +1,4 @@
-package com.lin.sim.config;
+package com.lin.simserver.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

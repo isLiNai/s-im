@@ -1,6 +1,5 @@
 package com.lin.sim.chat.entity;
 
-import com.lin.sim.chat.enums.MessageType;
 import lombok.Data;
 
 import java.util.HashMap;

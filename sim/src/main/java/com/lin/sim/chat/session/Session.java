@@ -1,5 +1,6 @@
 package com.lin.sim.chat.session;
 
+import com.lin.sim.chat.constant.ImNotice;
 import com.lin.sim.chat.entity.MessageResp;
 import com.lin.sim.entity.resp.OnLineUserResp;
 import com.lin.sim.utils.AscUtils;
@@ -52,16 +53,16 @@ public class Session {
      *  上线通知所有用户（除本身外）
      * @param currentChannel
      */
-    public void noticenAllChannel(Channel currentChannel){
+    public void noticenOnlineAllChannel(Channel currentChannel){
         // 当前用户提示绑定成功
         MessageResp boundMessage = new MessageResp();
-        boundMessage.setKey("bound");
+        boundMessage.setKey(ImNotice.BOUND);
         boundMessage.setContent("绑定成功");
         currentChannel.writeAndFlush(boundMessage);
 
         // 其他用户提示有用户上线通知
         MessageResp onlineMessage = new MessageResp();
-        onlineMessage.setKey("online");
+        onlineMessage.setKey(ImNotice.ONLINE);
         onlineMessage.setContent("有用户上线");
         Enumeration<String> keys = this.channelMap.keys();
         String userToken = currentChannel.attr(key).get();
@@ -94,6 +95,11 @@ public class Session {
         return this.channelMap.containsKey(userId) && this.channelMap.get(userId) != null;
     }
 
+    /**
+     * 离线 移除用户信息
+     * @param channel
+     * @return
+     */
     public Boolean offline(Channel channel){
         AttributeKey<String> key = AttributeKey.valueOf("user");
         String userToken = channel.attr(key).get();
@@ -101,18 +107,36 @@ public class Session {
         return true;
     }
 
+    /**
+     *  下线通知所有用户
+     * @param currentChannel
+     */
+    public void noticenOfflineAllChannel(){
+        // 下线通知
+        MessageResp offlineMessage = new MessageResp();
+        offlineMessage.setKey(ImNotice.OFFLINE);
+        offlineMessage.setContent("有用户下线");
+        Enumeration<String> keys = this.channelMap.keys();
+        while(keys.hasMoreElements()){
+            String key = keys.nextElement();
+            Channel channel = this.channelMap.get(key);
+            channel.writeAndFlush(offlineMessage);
+        }
+    }
 
-    public List<OnLineUserResp> findOnlineUser(){
+    public List<OnLineUserResp> findOnlineUser(String currentToken){
         Enumeration<String> keys = this.channelMap.keys();
         List<OnLineUserResp> onLineUserResps = new ArrayList<>();
         while(keys.hasMoreElements()){
             String token = keys.nextElement();
-            String decrypt = AscUtils.decrypt(token);
-            String[] split = decrypt.split("-");
-            OnLineUserResp onLineUserResp = new OnLineUserResp();
-            onLineUserResp.setUserName(split[1]);
-            onLineUserResp.setPassword(split[2]);
-            onLineUserResps.add(onLineUserResp);
+            if(!StringUtils.equals(token,currentToken)){
+                String decrypt = AscUtils.decrypt(token);
+                String[] split = decrypt.split("-");
+                OnLineUserResp onLineUserResp = new OnLineUserResp();
+                onLineUserResp.setUserName(split[1]);
+                onLineUserResp.setPassword(split[2]);
+                onLineUserResps.add(onLineUserResp);
+            }
         }
         return onLineUserResps;
     }

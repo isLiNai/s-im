@@ -1,9 +1,11 @@
-package com.lin.sim.controller;
+package com.lin.simserver.controller;
 
-import com.lin.sim.common.ResultDto;
-import com.lin.sim.entity.req.LoginReq;
-import com.lin.sim.utils.AscUtils;
-import com.lin.sim.utils.RedisUtils;
+import com.lin.simserver.common.ResultDto;
+import com.lin.simserver.entity.User;
+import com.lin.simserver.entity.req.LoginReq;
+import com.lin.simserver.repository.UserRepository;
+import com.lin.simserver.utils.AscUtils;
+import com.lin.simserver.utils.RedisUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,26 +26,29 @@ public class LoginController {
 
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private UserRepository userRepository;
+
 
     @PostMapping
     @ApiOperation(value = "登录", httpMethod = "POST")
     public ResultDto<String> login(@RequestBody LoginReq loginReq){
         // 认证
-        Boolean authenticate = authenticate(loginReq);
-        if(!authenticate){
-            ResultDto.error(500,"认证失败");
+        boolean ifLogin = authenticate(loginReq);
+        if(!ifLogin){
+            return ResultDto.error(500,"认证失败");
         }
         // 生成token
         String token = generateToken(loginReq);
-
         // token 放入redis
-//        redisUtils.set(loginReq.getUserName(),token);
+        redisUtils.set(loginReq.getUserName(),token);
         return new ResultDto<>(token);
     }
 
 
     private Boolean authenticate(LoginReq loginReq){
-        return true;
+        User user = userRepository.findByUserNameAndPassword(loginReq.getUserName(), loginReq.getPassWord());
+        return user != null ? true : false;
     }
 
     private String generateToken(LoginReq loginReq){

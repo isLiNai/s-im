@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>sim</title>
     <link rel="stylesheet" href="layui-v2.6.8/layui/css/layui.css">
     <link rel="stylesheet" href="css/msgCenter.css">
     <style>
@@ -72,34 +72,39 @@
     <script src="layui-v2.6.8/layui/layui.js"></script>
     <script src="js/simSocket.js"></script>
     <script>
+        var ws =  null;
         layui.use(function(){
             var layer = layui.layer;
         });
         $(function () {
-            var userId = document.cookie;
-            if(userId==null || userId == 'undefined' || userId == ''){
+            var token = document.cookie;
+            if(token==null || token == 'undefined' || token == ''){
                 window.location.href = 'login';
             }else{
-                var ws = new WebSocket("ws://localhost:8899/sim");
+                ws = new WebSocket("ws://localhost:8899/sim");
+                var index = layer.load(2);
                 ws.onopen = function(){
                     //当WebSocket创建成功时，触发onopen事件
                     console.log("open");
                     var boundObj = {
                         key: 'bound',
                         data: [{
-                            from: userId
+                            from: token
                         }]
                     }
-                    ws.send(JSON.stringify(boundObj)); //将消息发送到服务端
-                    findOnlineUser();
+                    ws.send(JSON.stringify(boundObj));
                 }
                 ws.onmessage = function(e){
                     //当客户端收到服务端发来的消息时，触发onmessage事件，参数e.data包含server传递过来的数据
                     console.log(e.data);
                     if(e.data!=null){
                         var parse = JSON.parse(e.data);
-                        if(parse.key == 'online'){
-                            findOnlineUser();
+                        if(parse.key == 'online' || parse.key == 'offline' || parse.key == 'bound'){
+                            findOnlineUser(token);
+                        }
+                        if(parse.key == 'findOnlineUser'){
+                            appendFriendList(parse.content.result);
+                            layer.close(index);
                         }
                     }
                 }
@@ -112,7 +117,6 @@
                     console.log(error);
                 }
             }
-
         });
 
         function friendClick (obj){
@@ -128,30 +132,24 @@
             $(".msg-row").css('background','');
         }
 
-        function findOnlineUser(){
-            var loginLoadIndex = layer.load(2);
-            $.ajax({
-                type:'get',
-                url: 'http://localhost:8081/user/online',
-                success:function (data) {
-                    if (data.status == 0){
-                        console.log(data);
-                        initFriendList(data.result);
-                        layer.close(loginLoadIndex);
-                    }
-                },
-                error:function (e) {
-                    layer.close(loginLoadIndex);
+        function findOnlineUser(token){
+            if(ws!=null){
+                var findOnlineUserObj = {
+                    key: 'findOnlineUser',
+                    data: [{
+                        token : token
+                    }]
                 }
-            });
+                ws.send(JSON.stringify(findOnlineUserObj));
+            }
         }
 
-        function initFriendList(onlineUsers){
+        function appendFriendList(onlineUsers){
+            $("#friends").html('');
            if(onlineUsers!=null && onlineUsers.length > 0){
-               $.each(onlineUsers,function(index,value){
+                $.each(onlineUsers,function(index,value){
                    $("#friends").append(friendHtml(value));
-               });
-
+                });
                 function friendHtml(value){
                     return " <div class=\"msg-row\" onclick=\"friendClick(this)\"> \n" +
                         "<img class=\"avatar-img\" src=\"img/avatar.png\" alt=\"\">\n" +

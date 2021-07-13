@@ -1,4 +1,4 @@
-package com.lin.sim.config;
+package com.lin.simserver.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;

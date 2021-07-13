@@ -29,11 +29,16 @@ public class SimHandler extends SimpleChannelInboundHandler<Message> {
         handlerEngine.process(ctx,msg);
     }
 
+    /**
+     * 用户下线 通知其他用户
+     * @param ctx
+     * @throws Exception
+     */
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("channel 退出！");
         Session session = SpringUtil.getBean(Session.class);
         session.offline(ctx.channel());
+        session.noticenOfflineAllChannel();
         super.channelUnregistered(ctx);
     }
 }

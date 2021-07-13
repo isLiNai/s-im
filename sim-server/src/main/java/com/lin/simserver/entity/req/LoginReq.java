@@ -1,4 +1,4 @@
-package com.lin.sim.entity.req;
+package com.lin.simserver.entity.req;
 
 import lombok.Data;
 

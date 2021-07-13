@@ -20,7 +20,7 @@
                 </div>
                 <div class="usernameDiv">
                     <i class="layui-icon layui-icon-username adminIcon"></i>
-                    <input id="loginUsername" class="layui-input adminInput" type="text" name="username" placeholder="输入用户名" >
+                    <input id="loginUsername" class="layui-input adminInput" type="text" name="username" placeholder="输入用户名" value="夏侯恩"/>
                 </div>
             </div>
             <div class="usernameWrapDiv">
@@ -29,7 +29,7 @@
                 </div>
                 <div class="passwordDiv">
                     <i class="layui-icon layui-icon-password adminIcon"></i>
-                    <input id="loginPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
+                    <input id="loginPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码" value="123456"/>
                 </div>
             </div>
             <div class="usernameWrapDiv">
@@ -71,6 +71,11 @@
         $('#loginBtn').click(function () {
             login();
         });
+        $(document).keyup(function(event){
+            if(event.keyCode ==13){
+               login();
+            }
+        });
         // 注册事件
         $('#loginRegister').click(function () {
             register();
@@ -96,6 +101,7 @@
     }
     // 校验验证码、用户名、密码
     function validateCode(inputID,codeID) {
+        return true;
         var inputCode = $(inputID).val().toUpperCase();
         var cardCode = $(codeID).val();
         var loginUsername = $('#loginUsername').val();
@@ -132,7 +138,7 @@
             $('#loginBtn').val("正在登录...");
             $.ajax({
                 type:'post',
-                url: 'http://localhost:8081/login',
+                url: 'http://localhost:8082/login',
                 dataType:'html',
                 data:JSON.stringify(params),
                 contentType:'application/json',
@@ -142,6 +148,8 @@
                     if (jsonData.status == 0){
                         document.cookie = jsonData.result;
                         window.location.href = 'home';
+                    }else{
+                        layer.msg('用户名或密码错误！', {time: 3000, icon:5})
                     }
                 },
                 error:function (e) {
