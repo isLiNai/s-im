@@ -1,5 +1,7 @@
 package com.lin.simserver.entity.resp;
 
+import lombok.Data;
+
 import java.util.Date;
 
 /**
@@ -9,8 +11,9 @@ import java.util.Date;
  * @version 1.0
  * @date 2021/7/13 14:18
  */
+@Data
 public class MessageResp {
-    private String id;
+    private Integer id;
     private String fromUserId;
     private String toUserId;
     private Integer status;

@@ -162,6 +162,17 @@
             $(obj).css('color','black');
             $(obj).css('background','#f5f5f5');
             $(obj).attr("ifSelect",true);
+
+            $.ajax({
+                type:'get',
+                url: 'http://localhost:8082/msg?currentUserId='+currentUser.userId+'&friendUserId='+$(obj).attr("userid"),
+                success:function (data) {
+                    if (data.status == 0){
+                      console.log(data)
+                    }else{
+                    }
+                }
+            });
         }
 
         function clearMsgRowCss(){

@@ -45,7 +45,8 @@ public class MessageController {
     @GetMapping
     public ResultDto<List<MessageResp>> findMessage(@RequestParam("currentUserId") String currentUserId,@RequestParam("friendUserId") String friendUserId){
         List<Message> messages = messageRepository.findByFromUserIdAndToUserId(currentUserId, friendUserId);
-
+        List<Message> messages2 = messageRepository.findByFromUserIdAndToUserId(friendUserId, currentUserId);
+        messages.addAll(messages2);
         List<MessageResp> messageResps = messages.stream().sorted((o1,o2)-> o1.getId() - o2.getId()).map(v -> {
             MessageResp messageResp = new MessageResp();
             BeanUtils.copyProperties(v, messageResp);
