@@ -34,26 +34,23 @@ public class LoginController {
     @ApiOperation(value = "登录", httpMethod = "POST")
     public ResultDto<String> login(@RequestBody LoginReq loginReq){
         // 认证
-        boolean ifLogin = authenticate(loginReq);
-        if(!ifLogin){
+        User user = authenticate(loginReq);
+        if(user == null){
             return ResultDto.error(500,"认证失败");
         }
         // 生成token
-        String token = generateToken(loginReq);
+        String token = AscUtils.generateToken(user);
         // token 放入redis
         redisUtils.set(loginReq.getUserName(),token);
         return new ResultDto<>(token);
     }
 
 
-    private Boolean authenticate(LoginReq loginReq){
+    private User authenticate(LoginReq loginReq){
         User user = userRepository.findByUserNameAndPassword(loginReq.getUserName(), loginReq.getPassWord());
-        return user != null ? true : false;
+        return user;
     }
 
-    private String generateToken(LoginReq loginReq){
-        String salt = "123";
-        return AscUtils.encrypt(salt + "-" + loginReq.getUserName() + "-" + loginReq.getPassWord());
-    }
+
 
 }

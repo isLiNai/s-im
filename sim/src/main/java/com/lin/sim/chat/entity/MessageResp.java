@@ -12,6 +12,9 @@ import lombok.Data;
 @Data
 public class MessageResp {
     private String key;
+    private Integer messageId;
+    private String fromUserId;
+    private String fromUserName;
     private Object content;
 
 }

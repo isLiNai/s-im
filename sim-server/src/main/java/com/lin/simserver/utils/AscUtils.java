@@ -2,6 +2,7 @@ package com.lin.simserver.utils;
 
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
 import cn.hutool.crypto.symmetric.SymmetricCrypto;
+import com.lin.simserver.entity.User;
 
 /**
  * TODO
@@ -36,5 +37,10 @@ public class AscUtils {
      */
     public static String decrypt(String content){
         return aes.decryptStr(content);
+    }
+
+    public static String generateToken(User user){
+        String salt = "123";
+        return AscUtils.encrypt(salt + "-" + user.getUserName() + "-" + user.getPassword() + "-" + user.getUserId());
     }
 }

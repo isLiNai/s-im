@@ -73,6 +73,7 @@
     <script src="js/simSocket.js"></script>
     <script>
         var ws =  null;
+        var currentUser = null;
         layui.use(function(){
             var layer = layui.layer;
         });
@@ -102,9 +103,45 @@
                         if(parse.key == 'online' || parse.key == 'offline' || parse.key == 'bound'){
                             findOnlineUser(token);
                         }
+                        if(parse.key == 'bound'){
+                            //绑定成功 获取当前用户登录信息
+                            $.ajax({
+                                type:'get',
+                                url: 'http://localhost:8082/user?token='+token,
+                                success:function (data) {
+                                    if (data.status == 0){
+                                        currentUser = data.result;
+                                    }else{
+                                        layer.msg('请重新登录！', {time: 3000, icon:5})
+                                    }
+                                }
+                            });
+                        }
                         if(parse.key == 'findOnlineUser'){
                             appendFriendList(parse.content.result);
                             layer.close(index);
+                        }
+                        if(parse.key == 'send'){
+                            addFromMessage(parse);
+                            // 修改消息 为成功。
+                            var sendSuccessObj = {
+                                'messageId' : parse.messageId
+                            }
+                            $.ajax({
+                                type:'post',
+                                url: 'http://localhost:8082/msg/sendSuccess',
+                                dataType:'html',
+                                data:JSON.stringify(sendSuccessObj),
+                                contentType:'application/json',
+                                success:function (data) {
+                                    var jsonData = JSON.parse(data);
+                                    if (jsonData.status == 0){
+                                        addCurrentMessage(sendText);
+                                    }
+                                },
+                                error:function (e) {
+                                }
+                            });
                         }
                     }
                 }
@@ -124,12 +161,14 @@
             $(obj).css('box-shadow','5px 5px 10px gray');
             $(obj).css('color','black');
             $(obj).css('background','#f5f5f5');
+            $(obj).attr("ifSelect",true);
         }
 
         function clearMsgRowCss(){
             $(".msg-row").css('box-shadow','');
             $(".msg-row").css('color','');
             $(".msg-row").css('background','');
+            $(".msg-row").attr('ifSelect',false);
         }
 
         function findOnlineUser(token){
@@ -151,12 +190,52 @@
                    $("#friends").append(friendHtml(value));
                 });
                 function friendHtml(value){
-                    return " <div class=\"msg-row\" onclick=\"friendClick(this)\"> \n" +
+                    return " <div class=\"msg-row\" userid=\""+value.userId+"\" onclick=\"friendClick(this)\"> \n" +
                         "<img class=\"avatar-img\" src=\"img/avatar.png\" alt=\"\">\n" +
                         ""+value.userName+"" +
                         "</div>";
                 }
            }
+        }
+
+        function sendMessage(){
+           var sendText = $("#sendText").val();
+            $(".msg-row").each(function(){
+                if($(this).attr('ifselect') == 'true'){
+                    var toUserId = $(this).attr('userid');
+                    var sendObj = {
+                        'fromUserId' : currentUser.userId,
+                        'toUserId' : toUserId,
+                        'content' : sendText
+                    }
+                    $.ajax({
+                        type:'post',
+                        url: 'http://localhost:8082/msg/send',
+                        dataType:'html',
+                        data:JSON.stringify(sendObj),
+                        contentType:'application/json',
+                        success:function (data) {
+                            var jsonData = JSON.parse(data);
+                            if (jsonData.status == 0){
+                                addCurrentMessage(sendText);
+                            }
+                        },
+                        error:function (e) {
+                        }
+                    });
+                }
+            });
+        }
+
+        function addFromMessage(msg){
+            var message = "<div class=\"atalk\"><span>"+msg.fromUserName+"说："+msg.content+"</span></div>";
+            $("#words").append(message);
+        }
+
+        function addCurrentMessage(content){
+            var message = "<div class=\"btalk\"><span>我说："+content+"</span></div>";
+            $("#words").append(message);
+            $("#sendText").val("");
         }
 
     </script>
@@ -185,26 +264,8 @@ background-attachment: fixed;">
                         </div>
                         <div class="msg-center talk_con">
                             <div class="talk_show" id="words">
-                                <div class="atalk"><span>A说：吃饭了吗？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="atalk"><span>A说：吃饭了吗？</span></div>
-                                <div class="atalk"><span>A说：吃饭了吗？</span></div>
-                                <div class="atalk"><span>A说：吃饭了吗？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
-                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>
+                               <!-- <div class="atalk"><span>A说：吃饭了吗？</span></div>
+                                <div class="btalk"><span>B说：还没呢，你呢？</span></div>-->
                             </div>
                         </div>
                         <div class="option">
@@ -216,11 +277,11 @@ background-attachment: fixed;">
                                 <i class="layui-icon layui-icon-log option-icon" style="float: right"><span style="font-size: 13px; padding-left: 6px">聊天记录</span></i>
                             </div>
                             <div class="send-div">
-                                <textarea class="send_text"></textarea>
+                                <textarea id="sendText" class="send_text"></textarea>
                             </div>
                             <div class="send-dowm">
                                 <button type="button" class="layui-btn layui-btn-sm layui-bg-blue msg_button">关闭</button>
-                                <button type="button" class="layui-btn layui-btn-sm layui-bg-blue msg_button_2">发送</button>
+                                <button type="button" class="layui-btn layui-btn-sm layui-bg-blue msg_button_2" onclick="sendMessage()">发送</button>
                             </div>
                         </div>
                     </div>

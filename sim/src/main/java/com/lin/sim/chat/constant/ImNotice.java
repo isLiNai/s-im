@@ -16,4 +16,9 @@ public interface ImNotice {
     String OFFLINE = "offline";
     // 寻找在线用户
     String FIND_ONLINE_USER = "findOnlineUser";
+
+    /**
+     * 消息发送
+     */
+    String SEND = "send";
 }

@@ -2,6 +2,7 @@ package com.lin.sim.chat.session;
 
 import com.lin.sim.chat.constant.ImNotice;
 import com.lin.sim.chat.entity.MessageResp;
+import com.lin.sim.entity.SendMsgDto;
 import com.lin.sim.entity.resp.OnLineUserResp;
 import com.lin.sim.utils.AscUtils;
 import io.netty.channel.Channel;
@@ -109,7 +110,6 @@ public class Session {
 
     /**
      *  下线通知所有用户
-     * @param currentChannel
      */
     public void noticenOfflineAllChannel(){
         // 下线通知
@@ -135,10 +135,27 @@ public class Session {
                 OnLineUserResp onLineUserResp = new OnLineUserResp();
                 onLineUserResp.setUserName(split[1]);
                 onLineUserResp.setPassword(split[2]);
+                onLineUserResp.setUserId(split[3]);
                 onLineUserResps.add(onLineUserResp);
             }
         }
         return onLineUserResps;
     }
+
+    public boolean sendMessage(SendMsgDto sendMsgDto){
+        Channel channel = this.channelMap.get(sendMsgDto.getToToken());
+        String decrypt = AscUtils.decrypt(sendMsgDto.getFromToken());
+        String[] split = decrypt.split("-");
+
+        MessageResp message = new MessageResp();
+        message.setKey(ImNotice.SEND);
+        message.setContent(sendMsgDto.getContent());
+        message.setFromUserName(split[1]);
+        message.setFromUserId(split[3]);
+        message.setMessageId(sendMsgDto.getMessageId());
+        channel.writeAndFlush(message);
+        return true;
+    }
+
 
 }

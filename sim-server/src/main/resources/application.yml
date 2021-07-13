@@ -4,6 +4,7 @@ spring:
     application:
         name: sim-server
     #=========H2=====
+    #===========控制台  http://localhost:8082/h2-console =====
     datasource:
         driverClassName: org.h2.Driver
         password: ''
