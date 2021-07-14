@@ -41,7 +41,7 @@ public class LoginController {
         // 生成token
         String token = AscUtils.generateToken(user);
         // token 放入redis
-        redisUtils.set(loginReq.getUserName(),token);
+//        redisUtils.set(loginReq.getUserName(),token);
         return new ResultDto<>(token);
     }
 

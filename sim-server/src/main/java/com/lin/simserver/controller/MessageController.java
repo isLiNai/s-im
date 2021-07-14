@@ -9,19 +9,21 @@ import com.lin.simserver.entity.req.MessageSuccessReq;
 import com.lin.simserver.entity.req.SendMsgDto;
 import com.lin.simserver.entity.req.SendMsgReq;
 import com.lin.simserver.entity.resp.MessageResp;
+import com.lin.simserver.entity.resp.UserResp;
 import com.lin.simserver.repository.MessageRepository;
 import com.lin.simserver.repository.UserRepository;
 import com.lin.simserver.utils.AscUtils;
 import com.lin.simserver.utils.RedisUtils;
 import com.sun.org.apache.regexp.internal.RE;
 import io.swagger.annotations.Api;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -44,12 +46,28 @@ public class MessageController {
 
     @GetMapping
     public ResultDto<List<MessageResp>> findMessage(@RequestParam("currentUserId") String currentUserId,@RequestParam("friendUserId") String friendUserId){
+        User currentUser = userRepository.findByUserId(currentUserId);
+        User friendUser = userRepository.findByUserId(friendUserId);
+
+        Map<String,User> userMap = new HashMap<>();
+        userMap.put(currentUser.getUserId(),currentUser);
+        userMap.put(friendUser.getUserId(),friendUser);
+
         List<Message> messages = messageRepository.findByFromUserIdAndToUserId(currentUserId, friendUserId);
         List<Message> messages2 = messageRepository.findByFromUserIdAndToUserId(friendUserId, currentUserId);
         messages.addAll(messages2);
         List<MessageResp> messageResps = messages.stream().sorted((o1,o2)-> o1.getId() - o2.getId()).map(v -> {
             MessageResp messageResp = new MessageResp();
             BeanUtils.copyProperties(v, messageResp);
+
+            UserResp toUserResp = new UserResp();
+            BeanUtils.copyProperties(userMap.get(v.getToUserId()),toUserResp);
+            messageResp.setToUser(toUserResp);
+
+            UserResp fromUserResp = new UserResp();
+            BeanUtils.copyProperties(userMap.get(v.getFromUserId()),fromUserResp);
+            messageResp.setFromUser(fromUserResp);
+
             return messageResp;
         }).collect(Collectors.toList());
         return ResultDto.ok(messageResps);

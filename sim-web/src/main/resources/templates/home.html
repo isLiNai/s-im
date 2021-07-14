@@ -116,13 +116,14 @@
                                     }
                                 }
                             });
+                            layer.close(index);
                         }
                         if(parse.key == 'findOnlineUser'){
                             appendFriendList(parse.content.result);
                             layer.close(index);
                         }
                         if(parse.key == 'send'){
-                            addFromMessage(parse);
+                              addSocketFromMessage(parse);
                             // 修改消息 为成功。
                             var sendSuccessObj = {
                                 'messageId' : parse.messageId
@@ -157,22 +158,36 @@
         });
 
         function friendClick (obj){
-            clearMsgRowCss();
-            $(obj).css('box-shadow','5px 5px 10px gray');
-            $(obj).css('color','black');
-            $(obj).css('background','#f5f5f5');
-            $(obj).attr("ifSelect",true);
-
-            $.ajax({
-                type:'get',
-                url: 'http://localhost:8082/msg?currentUserId='+currentUser.userId+'&friendUserId='+$(obj).attr("userid"),
-                success:function (data) {
-                    if (data.status == 0){
-                      console.log(data)
-                    }else{
+            var ifselect = $(obj).attr("ifSelect");
+            if(ifselect == true || ifselect == 'true' ){
+            }else{
+                clearMsgRowCss();
+                $(obj).css('box-shadow','5px 5px 10px gray');
+                $(obj).css('color','black');
+                $(obj).css('background','#f5f5f5');
+                $(obj).attr("ifSelect",true);
+                $('#words').html('');
+                $.ajax({
+                    type:'get',
+                    url: 'http://localhost:8082/msg?currentUserId='+currentUser.userId+'&friendUserId='+$(obj).attr("userid"),
+                    success:function (data) {
+                        if (data.status == 0 && data.result.length > 0){
+                            for (var i = 0; i < data.result.length; i++) {
+                                var msgObj = data.result[i]
+                                if(currentUser.userId == msgObj.fromUser.userId){
+                                    addCurrentMessage(msgObj.content);
+                                }else{
+                                    var msg = {};
+                                    msg.fromUserName =  msgObj.fromUser.userName;
+                                    msg.content =  msgObj.content;
+                                    addFromMessage(msg);
+                                }
+                            }
+                        }else{
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         function clearMsgRowCss(){
@@ -195,18 +210,32 @@
         }
 
         function appendFriendList(onlineUsers){
-            $("#friends").html('');
+
+            var clickUserId = null;
+            $(".msg-row").each(function(){
+                if($(this).attr('ifselect') == 'true'){
+                    clickUserId = $(this).attr('userid');
+                }
+            });
+           $("#friends").html('');
            if(onlineUsers!=null && onlineUsers.length > 0){
                 $.each(onlineUsers,function(index,value){
                    $("#friends").append(friendHtml(value));
                 });
                 function friendHtml(value){
+                    if(value.userId == clickUserId){
+                        return " <div class=\"msg-row\" ifSelect='true' style=\"box-shadow: gray 5px 5px 10px; color: black; background: rgb(245, 245, 245);\" userid=\""+value.userId+"\" onclick=\"friendClick(this)\"> \n" +
+                            "<img class=\"avatar-img\" src=\"img/avatar.png\" alt=\"\">\n" +
+                            ""+value.userName+"" +
+                            "</div>"
+                    }
                     return " <div class=\"msg-row\" userid=\""+value.userId+"\" onclick=\"friendClick(this)\"> \n" +
                         "<img class=\"avatar-img\" src=\"img/avatar.png\" alt=\"\">\n" +
                         ""+value.userName+"" +
                         "</div>";
                 }
            }
+            checkFriendList();
         }
 
         function sendMessage(){
@@ -247,6 +276,21 @@
             var message = "<div class=\"btalk\"><span>我说："+content+"</span></div>";
             $("#words").append(message);
             $("#sendText").val("");
+        }
+
+        function addSocketFromMessage(msg){
+            var fromUserId = msg.fromUserId;
+            $(".msg-row").each(function(){
+                if($(this).attr('ifselect') == 'true' && $(this).attr('userid') == fromUserId){
+                    addFromMessage(msg);
+                }
+            });
+        }
+
+        function checkFriendList(){
+            if($(".msg-row").length == 0){
+                $('#words').html('');
+            }
         }
 
     </script>

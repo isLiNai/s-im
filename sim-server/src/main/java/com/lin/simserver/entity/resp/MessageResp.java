@@ -14,8 +14,8 @@ import java.util.Date;
 @Data
 public class MessageResp {
     private Integer id;
-    private String fromUserId;
-    private String toUserId;
+    private UserResp fromUser;
+    private UserResp toUser;
     private Integer status;
     private String content;
     private Date createDate;
