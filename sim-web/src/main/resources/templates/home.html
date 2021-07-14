@@ -82,7 +82,7 @@
             if(token==null || token == 'undefined' || token == ''){
                 window.location.href = 'login';
             }else{
-                ws = new WebSocket("ws://localhost:8899/sim");
+                ws = new WebSocket("ws://"+window.location.hostname+":8899/sim");
                 var index = layer.load(2);
                 ws.onopen = function(){
                     //当WebSocket创建成功时，触发onopen事件
@@ -107,7 +107,7 @@
                             //绑定成功 获取当前用户登录信息
                             $.ajax({
                                 type:'get',
-                                url: 'http://localhost:8082/user?token='+token,
+                                url: window.location.protocol+'//'+window.location.hostname+':8082/user?token='+token,
                                 success:function (data) {
                                     if (data.status == 0){
                                         currentUser = data.result;
@@ -130,7 +130,7 @@
                             }
                             $.ajax({
                                 type:'post',
-                                url: 'http://localhost:8082/msg/sendSuccess',
+                                url: window.location.protocol+'//'+window.location.hostname+':8082/msg/sendSuccess',
                                 dataType:'html',
                                 data:JSON.stringify(sendSuccessObj),
                                 contentType:'application/json',
@@ -169,7 +169,7 @@
                 $('#words').html('');
                 $.ajax({
                     type:'get',
-                    url: 'http://localhost:8082/msg?currentUserId='+currentUser.userId+'&friendUserId='+$(obj).attr("userid"),
+                    url: window.location.protocol+'//'+window.location.hostname+':8082/msg?currentUserId='+currentUser.userId+'&friendUserId='+$(obj).attr("userid"),
                     success:function (data) {
                         if (data.status == 0 && data.result.length > 0){
                             for (var i = 0; i < data.result.length; i++) {
@@ -250,7 +250,7 @@
                     }
                     $.ajax({
                         type:'post',
-                        url: 'http://localhost:8082/msg/send',
+                        url: window.location.protocol+'//'+window.location.hostname+':8082/msg/send',
                         dataType:'html',
                         data:JSON.stringify(sendObj),
                         contentType:'application/json',
@@ -265,11 +265,13 @@
                     });
                 }
             });
+            $("#words").animate({ scrollTop: "+=50" }, 500);
         }
 
         function addFromMessage(msg){
             var message = "<div class=\"atalk\"><span>"+msg.fromUserName+"说："+msg.content+"</span></div>";
             $("#words").append(message);
+            $("#words").animate({ scrollTop: "+=50" }, 500);
         }
 
         function addCurrentMessage(content){

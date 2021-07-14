@@ -22,8 +22,8 @@ import javax.persistence.Id;
 @NoArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     private String userId;
     private String userName;
     private String password;

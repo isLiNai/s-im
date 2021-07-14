@@ -1,10 +1,10 @@
 DROP TABLE IF EXISTS user;
 CREATE TABLE user(
                      id INT AUTO_INCREMENT PRIMARY KEY,
-                     user_id varchar(32),
-                     user_name varchar(32),
-                     password varchar(32),
-                     avatar varchar(32)
+                     user_id varchar(36),
+                     user_name varchar(36),
+                     password varchar(36),
+                     avatar varchar(36)
 );
 
 INSERT INTO user ( user_id, user_name,password,avatar) VALUES
@@ -15,8 +15,8 @@ INSERT INTO user ( user_id, user_name,password,avatar) VALUES
 DROP TABLE IF EXISTS message;
 CREATE TABLE message(
                      id INT AUTO_INCREMENT PRIMARY KEY,
-                     from_user_id varchar(32),
-                     to_user_id varchar(32),
+                     from_user_id varchar(36),
+                     to_user_id varchar(36),
                      status INT,
                      content varchar(1000),
                      create_date DATE,

@@ -20,7 +20,7 @@
                 </div>
                 <div class="usernameDiv">
                     <i class="layui-icon layui-icon-username adminIcon"></i>
-                    <input id="loginUsername" class="layui-input adminInput" type="text" name="username" placeholder="输入用户名" value="夏侯恩"/>
+                    <input id="loginUsername" class="layui-input adminInput" type="text" name="username" placeholder="输入用户名"/>
                 </div>
             </div>
             <div class="usernameWrapDiv">
@@ -29,7 +29,7 @@
                 </div>
                 <div class="passwordDiv">
                     <i class="layui-icon layui-icon-password adminIcon"></i>
-                    <input id="loginPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码" value="123456"/>
+                    <input id="loginPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码"/>
                 </div>
             </div>
             <div class="usernameWrapDiv">
@@ -137,7 +137,7 @@
             $('#loginBtn').val("正在登录...");
             $.ajax({
                 type:'post',
-                url: 'http://localhost:8082/login',
+                url: window.location.protocol+'//'+window.location.hostname+':8082/login',
                 dataType:'html',
                 data:JSON.stringify(params),
                 contentType:'application/json',
@@ -175,22 +175,20 @@
                 var registerUsername = $('#registerUsername').val();
                 var registerPassword = $('#registerPassword').val();
                 var registerWellPassword = $('#registerWellPassword').val();
-                var selectValue = $('#roleSelect option:selected').val();
                 var params = {};
-                params.registerUsername = registerUsername;
-                params.registerPassword = registerPassword;
+                params.userName = registerUsername;
+                params.password = registerPassword;
                 params.registerWellPassword = registerWellPassword;
-                params.selectValue = selectValue;
                 var registerLoadIndex = layer.load(2);
                 $.ajax({
                     type:'post',
-                    url:window.location.protocol+'//'+window.location.host+'/security-web/register.do',
+                    url:window.location.protocol+'//'+window.location.hostname+':8082/user',
                     dataType:'json',
                     data:JSON.stringify(params),
                     contentType:'application/json',
                     success:function (data) {
                         layer.close(registerLoadIndex);
-                        layer.msg(data);
+                        layer.msg("注册成功");
                     },
                     error:function () {
                         layer.close(registerLoadIndex);
@@ -242,18 +240,6 @@
                 <div class="passwordDiv">
                     <i class="layui-icon layui-icon-password adminIcon"></i>
                     <input id="registerWellPassword" class="layui-input adminInput" type="password" name="password" placeholder="输入密码">
-                </div>
-            </div>
-            <div class="usernameWrapDiv">
-                <div class="usernameLabel">
-                    <label>角色类型:</label>
-                </div>
-                <div class="passwordDiv">
-                    <select id="roleSelect" class="layui-select">
-                        <option value="">请选择...</option>
-                        <option value="0">经纪人</option>
-                        <option value="1">房东</option>
-                    </select>
                 </div>
             </div>
         </form>

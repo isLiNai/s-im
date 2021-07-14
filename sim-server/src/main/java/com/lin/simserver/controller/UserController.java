@@ -1,7 +1,9 @@
 package com.lin.simserver.controller;
 
+import cn.hutool.core.util.IdUtil;
 import com.lin.simserver.common.ResultDto;
 import com.lin.simserver.entity.User;
+import com.lin.simserver.entity.req.RegisterUser;
 import com.lin.simserver.entity.resp.UserResp;
 import com.lin.simserver.repository.UserRepository;
 import com.lin.simserver.utils.AscUtils;
@@ -34,6 +36,17 @@ public class UserController {
         UserResp userResp = new UserResp();
         BeanUtils.copyProperties(user,userResp);
         return new ResultDto<>(userResp);
+    }
+
+    @PostMapping
+    public ResultDto<Boolean> register(@RequestBody RegisterUser registerUser){
+        // todo 需判断是否已存在
+
+        User user = new User();
+        BeanUtils.copyProperties(registerUser,user);
+        user.setUserId(IdUtil.simpleUUID());
+        userRepository.save(user);
+        return new ResultDto<>(Boolean.TRUE);
     }
 
 }
